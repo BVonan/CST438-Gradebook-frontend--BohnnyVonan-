@@ -60,10 +60,15 @@ class Gradebook extends React.Component {
   
     // when submit button pressed, send updated grades to back end 
     //  and then fetch the new grades.
-    handleSubmit = ( ) => {
+    handleSubmit = () => {
       console.log("Gradebook.handleSubmit");
       const token = Cookies.get('XSRF-TOKEN');
-      
+    
+      const confirmed = window.confirm("Are you sure you want to submit the grades?");
+      if (!confirmed) {
+        return;
+      }
+    
       fetch(`${SERVER_URL}/gradebook/${this.props.location.assignment.assignmentId}` , 
           {  
             method: 'PUT', 
@@ -74,22 +79,24 @@ class Gradebook extends React.Component {
       .then(res => {
           if (res.ok) {
             toast.success("Grades successfully updated", {
-            position: toast.POSITION.BOTTOM_LEFT
+              position: toast.POSITION.BOTTOM_LEFT
             });
             this.fetchGrades();
           } else {
             toast.error("Grade updated failed", {
-            position: toast.POSITION.BOTTOM_LEFT
+              position: toast.POSITION.BOTTOM_LEFT
             });
             console.error('Put http status =' + res.status);
-      }})
-        .catch(err => {
-          toast.error("Grade updated failed", {
-            position: toast.POSITION.BOTTOM_LEFT
-          });
-          console.error(err);
+          }
+      })
+      .catch(err => {
+        toast.error("Grade updated failed", {
+          position: toast.POSITION.BOTTOM_LEFT
         });
-   };        
+        console.error(err);
+      });
+    };
+    
     
     // when user has entered a new grade, update the state
     //  id    - index of row of grade change
